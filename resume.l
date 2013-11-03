@@ -53,8 +53,8 @@
    )
 
 (de str-replace (s-chopped,what,to)
-   # функция замены символа на строку
-   # ожидает что строка уже порублена (chop)
+   # функция замены подстрок
+   # ожидает что строка s уже порублена (chop)
    
    (let (to-chopped (chop to)
          what-chopped (chop what)
