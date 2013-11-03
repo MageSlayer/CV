@@ -34,37 +34,42 @@
  )
 
 (de education (period, establishment, speciality, qualicafication)
-   (list 
-      (.p (.strong "Период : ") period)
-      (.p (.strong "Название учебного заведения : ") establishment)
-      (.p (.strong "Специальность : ") speciality)
-      (.p (.strong "Полученная степень (квалификация) : ") qualicafication))
+   (..table 
+      (list 
+         (list (.strong "Период : ") period)
+         (list (.strong "Название учебного заведения : ") establishment)
+         (list (.strong "Специальность : ") speciality)
+         (list (.strong "Полученная степень (квалификация) : ") qualicafication) ))
  )
 
 (de recommendation (name, telephone, email, position, company)
-   (list 
-      (.p (.strong "Имя : ") name)
-      (.p (.strong "Телефон/факс : ") telephone)
-      (.p (.strong "E-mail : ") email)
-      (.p (.strong "Должность : ") position)
-      (.p (.strong "Компания : ") company) )
-)
+   (..table
+      (list 
+         (list (.strong "Имя : ") name)
+         (list (.strong "Телефон/факс : ") telephone)
+         (list (.strong "E-mail : ") email)
+         (list (.strong "Должность : ") position)
+         (list (.strong "Компания : ") company) ))
+ )
 
 (de job-conditions (kind, work-type, field, business-trips, relocation-time, desired-tech)
-   (list 
-      (.p (.strong "Желаемая форма занятости : ") kind)
-      (.p (.strong "Желаемый график работы : ") work-type)
-      (.p (.strong "Желаемое направление деятельности : ") field)
-      (.p (.strong "Готовность к командировкам : ") business-trips)
-      (.p (.strong "Срок возможного выхода на работу с момента поступления предложения : ") relocation-time) 
-      (.p (.strong "Предпочтительные технологии : ") desired-tech) )
-   )
+   (..table
+      (list 
+         (list (.strong "Желаемая форма занятости : ") kind)
+         (list (.strong "Желаемый график работы : ") work-type)
+         (list (.strong "Желаемое направление деятельности : ") field)
+         (list (.strong "Готовность к командировкам : ") business-trips)
+         (list (.strong "Срок возможного выхода на работу^Jс момента поступления предложения : ") relocation-time) 
+         (list (.strong "Предпочтительные технологии : ") desired-tech) ) 
+      )
+ )
 
 (de dev-lang-experience (x)
    (cons (.p (.strong "Опыт программирования : "))
-      (mapcar '((expr) 
-                (.p (.strong (car expr)) " : с " (cadr expr) "г.") )
-         x ))
+      (..table
+         (mapcar '((expr) 
+                   (list (.strong (car expr)) (pack " с " (cadr expr) "г.")) )
+            x ) ))
  )
 
 (setq txt
@@ -75,12 +80,14 @@
          
          (.h1 '((align center)) "Головань Денис Сергеевич")
          
-         (.p "Домашний адрес: г. Киев ул. Олевская 5 кв. 201")
-         (.p "мобильный телефон: 	+38 097 413-38-13")
-         (.p "e-mail, Mail-Agent:	 denis_golovan@mail.ru")
-         (.p "e-mail, googletalk:	 denisgolovan@gmail.com")
-         (.p "ICQ: 	105051989")
-         (.p "Дата рождения: 	10.10.1981")
+         (..table 
+            (list
+               (list (.strong "Домашний адрес:")      "г. Киев ул. Олевская 5 кв. 201")
+               (list (.strong "Мобильный телефон:")   "+38 097 413-38-13")
+               (list (.strong "e-mail, Mail-Agent:")  "denis_golovan@mail.ru")
+               (list (.strong "e-mail, googletalk:")  "denisgolovan@gmail.com")    
+               (list (.strong "ICQ:")                 "105051989")
+               (list (.strong "Дата рождения:")       "10.10.1981") ) )
          
          #(.br)
          (.p "Семейное положение: женат, детей нет.")
@@ -247,11 +254,11 @@
             "Информационные технологии"
             "Да"
             "2-3 недели"
-            "Языки программирования: Common Lisp, Clojure, APL, A+, J, KDB")
+            "языки программирования - Common Lisp, Clojure, APL, A+, J, KDB")
          
          (.br)
          (.p (.strong "Дополнительная информация :"))
-         (.p (.strong "Владение языком :") "Английский технический, advanced level.")
+         (.p (.strong "Владение языком : ") "Английский технический, advanced level.")
          
          (.br)
          (dev-lang-experience 
@@ -284,7 +291,6 @@
             
  ) ) )
 # ====================Content==========================================================
-
 # тест
 #(prinl (htmlify txt))
 (prinl txt)

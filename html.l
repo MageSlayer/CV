@@ -1,10 +1,10 @@
 # модуль для преобразования разметки на lisp в html
 
-# добавить таблицы
+# +добавить таблицы
 # +добавить перечисления без номеров
 
 (setq html-tags
-   '(.html .head .body .p .br .strong .ul .li .h1 .h2))
+   '(.html .head .body .p .br .strong .ul .li .h1 .h2 .table .tr .td))
 
 (de flatten (l)
    # избавиться от вложенности
@@ -123,6 +123,21 @@
    # функция для удобного создания маркированного списка
    (tag-long '.ul NIL 
       (mapcar '((tag) (tag-long '.li NIL tag)) (pass all-args))
+      )
+ )
+
+(de ..table-row (row)
+   # функция для создания строки значений таблицы
+   (tag-long '.tr NIL 
+      (mapcar '((cell) (tag-long '.td NIL cell)) row))
+ )
+
+(de ..table (rows, options)
+   # функция для удобного создания таблиц
+   # options - аттрибуты таблицы (ассоциативный список)
+   
+   (tag-long '.table NIL 
+      (mapcar '((row) (..table-row row)) rows)
       )
  )
 
