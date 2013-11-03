@@ -11,8 +11,7 @@
  )
 
 (de job-description (x)
-   (list
-      ('.p (.strong "Обязанности : ") x))
+   (.p (.strong "Обязанности : ") x) 
  )
 
 (de projects-gen ( caption . @ )
@@ -80,14 +79,19 @@
          
          (.h1 '((align center)) "Головань Денис Сергеевич")
          
-         (..table 
+         (..table
             (list
-               (list (.strong "Домашний адрес:")      "г. Киев ул. Олевская 5 кв. 201")
-               (list (.strong "Мобильный телефон:")   "+38 097 413-38-13")
-               (list (.strong "e-mail, Mail-Agent:")  "denis_golovan@mail.ru")
-               (list (.strong "e-mail, googletalk:")  "denisgolovan@gmail.com")    
-               (list (.strong "ICQ:")                 "105051989")
-               (list (.strong "Дата рождения:")       "10.10.1981") ) )
+               (list
+                  (..table 
+                     (list
+                        (list (.strong "Домашний адрес:")      "г. Киев ул. Олевская 5 кв. 201")
+                        (list (.strong "Мобильный телефон:")   "+38 097 413-38-13")
+                        (list (.strong "e-mail, Mail-Agent:")  (..mailto "denis_golovan@mail.ru" "Job offer"))
+                        (list (.strong "e-mail, googletalk:")  (..mailto "denisgolovan@gmail.com" "Job offer"))
+                        (list (.strong "ICQ:")                 "105051989")
+                        (list (.strong "Дата рождения:")       "10.10.1981") ) )
+                  (.img "Golovan.jpg" "фото Головань Д.С.")
+                  ) ) )
          
          #(.br)
          (.p "Семейное положение: женат, детей нет.")

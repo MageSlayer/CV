@@ -4,7 +4,7 @@
 # +добавить перечисления без номеров
 
 (setq html-tags
-   '(.html .head .body .p .br .strong .ul .li .h1 .h2 .table .tr .td))
+   '(.html .head .body .br .p .strong .ul .li .h1 .h2 .table .tr .td))
 
 (de flatten (l)
    # избавиться от вложенности
@@ -68,6 +68,11 @@
       Str )
  )
 
+(de str-hex (s)
+   # преобразует пробелы в код с процентами
+   (pack (str-replace (chop s) " " "%20"))
+ )
+
 (de tag-str-sanitize (s)
    # изменение служебных символов на символы html
    (let (sl (chop s))
@@ -115,10 +120,6 @@
    (pack "<" (tag-name tag-sym) " " (tag-attrs attrs) " />")
  )
 
-(de .meta (attrs)
-   (tag-short '.meta attrs)
- )
-
 (de ..list @
    # функция для удобного создания маркированного списка
    (tag-long '.ul NIL 
@@ -155,6 +156,24 @@
          (mapcar '((tag) (list 'setq tag (list 'tag-func-local (cons 'quote tag)))) html-tags) ) )
  )
 (tag-funcs-export)
+
+# все функции-тэги написанные вручную должны описаны после tag-funcs-export
+
+(de .meta (attrs)
+   (tag-short '.meta attrs)
+ )
+
+(de .img (url,alttext)
+   (tag-short '.img (list (list 'src url) (list 'alt alttext)))
+   )
+
+(de .a (url,anchor)
+   (tag-long '.a (list (list 'href url) (list 'rel "nofollow")) anchor)
+ )
+
+(de ..mailto (email,subject)
+   (.a (pack "mailto:" email (and subject (pack "?subject=" (str-hex subject)))) email)
+ )
 
 # использование специальной функции для преобразования
 (de htmlify (t)
