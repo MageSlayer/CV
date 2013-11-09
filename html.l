@@ -117,13 +117,14 @@
 
 (de tag-str-sanitize (s)
    # изменение служебных символов на символы html
+   # полный список, похоже, здесь - http://www.htmlhelp.com/reference/html40/entities/special.html
    (let (sl (chop s))
       (pack (->> sl
                (str-replace "&" "&amp;")
                (str-replace "<" "&lt;")
                (str-replace ">" "&gt;") 
                (str-replace "^J" "<br>") ) )
-   ))
+      ) )
 
 (de tag-sanitize (subtags)
    # подготовка тэгов для публикации в html
