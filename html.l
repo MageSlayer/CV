@@ -229,6 +229,14 @@
          (html-postprocess (list (tag-long '.html NIL subtags))) ) )
  )
 
+(de ..html-std @
+   # стандартная html-страница
+   (.html
+      (.meta (..attrs '((http-equiv "Content-Type")
+                        (content "text/html; charset=utf-8") ) ) )
+      (.body (pass all-args)) )
+ )
+
 (de .meta (attrs)
    (tag-short '.meta attrs)
  )
