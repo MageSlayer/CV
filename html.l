@@ -4,7 +4,7 @@
 # +добавить перечисления без номеров
 
 (setq html-tags
-   '(.html .head .body .br .p .strong .ul .li .h1 .h2 .table .tr .td))
+   '(.head .body .br .p .strong .ul .li .h1 .h2 .table .tr .td))
 
 (de flatten (l)
    # избавиться от вложенности
@@ -19,9 +19,29 @@
       (reverse res))
    )
 
+(de concat @
+   # объединяет все элементы в один список
+   (apply conc (mapcar '((x) (if (lst? x) x (list x))) (pass all-args)))
+ )
+
+(de tag? (x)
+   (and (pair x) 
+      (= (car x) 'tag) )
+ )
+
+(de ntag? (x)
+   (not (tag? x))
+ )
+
+(de ..attrs @
+   (cons
+      'attrs (pass all-args))
+ )
+
 (de attrs? (x)
    # проверяет является ли аргумент ассоциативным массивом/аттрибутами
-   (and (pair x) (pair (car x)) T)
+   (and (pair x)
+      (= (car x) 'attrs))           # помеченные аттрибутами
  )
 
 (de nattrs? (x)
@@ -29,8 +49,12 @@
  )
 
 (de tag-attrs (tags)
-   (glue " " 
-      (mapcar '((p) (list (sym (car p)) "=\"" (car (cdr p)) "\"")) tags))
+   (if (not (attrs? tags))
+      (quit "Only attrs params supported"))
+
+   (let (a (cadr tags))
+      (glue " " 
+         (mapcar '((p) (list (sym (car p)) "=\"" (car (cdr p)) "\"")) a) ))
  )
 
 (de tag-start (tag attrs)
@@ -73,51 +97,78 @@
    (pack (str-replace (chop s) " " "%20"))
  )
 
+(de ->> f
+   # a macro similar to threading macro in Clojure
+   (let (val (eval (car f))
+         cf (cdr f))
+      (loop
+         (T (not cf) val) 
+         (setq val (apply (caar cf) (cons val (cdar cf))))
+         (setq cf (cdr cf))
+         )
+      val
+      )
+ )
+
+#(-> 1
+#   (+ 2 3)
+#   (* 10)
+#   (pack "sdf"))
+
 (de tag-str-sanitize (s)
    # изменение служебных символов на символы html
    (let (sl (chop s))
-      (pack (str-replace sl "^J" "<br>"))
-      )
-   )
+      (pack (->> sl
+               (str-replace "&" "&amp;")
+               (str-replace "<" "&lt;")
+               (str-replace ">" "&gt;") 
+               (str-replace "^J" "<br>") ) )
+   ))
 
 (de tag-sanitize (subtags)
    # подготовка тэгов для публикации в html
 
-   (let 
-      (subtags-list (if (pair subtags)
+  (let 
+     (subtags-list (if (pair subtags)
                        subtags 
                        (list subtags))  # преобразуем в список, если subtags - просто строка
       
        sanitized (mapcar '((tag) 
                            (if (str? tag) 
                               (tag-str-sanitize tag)
-                              tag ) )
+                              tag
+                              ) )
                     subtags-list )
-       
        result (if (pair subtags)        # если на вход была подана просто строка, то возращаем тоже строку
                  sanitized
                  (car sanitized) ) )
-      result 
- ) )
+     result ) 
+ )
+
 
 (de tag-long (tag-sym, attrs, subtags)
    (let (name (tag-name tag-sym))
-      (pack 
-         (tag-start name attrs) 
-         (tag-sanitize subtags)
-         (tag-end name) ) )
- )
+      (list 'tag                         # помечаем как тэг
+         (tag-start name attrs)
+         (if (tag? subtags)
+            subtags
+            (tag-sanitize subtags))
+         (tag-end name) ) 
+   ))
 
 (de tag-func-local (@tag-sym)
    (curry (@tag-sym)
       @ (let (args1 (pass all-args)
               attrs (car (filter attrs? args1))
               subtags (filter nattrs? args1))
-           (tag-long '@tag-sym attrs subtags))) 
+           #(pretty attrs)
+           (tag-long '@tag-sym attrs subtags) ) ) 
  )
 
 (de tag-short (tag-sym attrs)
-   (pack "<" (tag-name tag-sym) " " (tag-attrs attrs) " />")
+   (list 'tag  # помечаем как тэг
+      (pack "<" (tag-name tag-sym) 
+               (and attrs (pack " " (tag-attrs attrs))) "/>" ) ) 
  )
 
 (de ..list @
@@ -159,17 +210,35 @@
 
 # все функции-тэги написанные вручную должны описаны после tag-funcs-export
 
+(de html-postprocess (tags)
+   (mapcar '((tag) 
+             (cond
+                ((tag? tag) (html-postprocess (cdr tag)))
+                ((pair tag) (html-postprocess tag))
+                (T tag) )
+             ) tags)
+   )
+
+(de .html @
+   # функция "сборки" html
+   # рекурсивно проходится по всем спискам и выдает одну строку на выходе
+   
+   (let (subtags (pass all-args))
+      (pack 
+         (html-postprocess (list (tag-long '.html NIL subtags))) ) )
+ )
+
 (de .meta (attrs)
    (tag-short '.meta attrs)
  )
 
 (de .img (url,alttext)
-   (tag-short '.img (list (list 'src url) (list 'alt alttext)))
+   (tag-short '.img (..attrs (list (list 'src url) (list 'alt alttext))))
    )
 
 (de .a (url,anchor)
-   (tag-long '.a (list (list 'href url) (list 'rel "nofollow")) anchor)
- )
+   (tag-long '.a (..attrs (list (list 'href url) (list 'rel "nofollow"))) anchor)
+   )
 
 (de ..mailto (email,subject)
    (.a (pack "mailto:" email (and subject (pack "?subject=" (str-hex subject)))) email)

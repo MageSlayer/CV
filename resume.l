@@ -64,20 +64,21 @@
  )
 
 (de dev-lang-experience (x)
-   (cons (.p (.strong "Опыт программирования : "))
+   (list (.p (.strong "Опыт программирования : "))
       (..table
          (mapcar '((expr) 
-                   (list (.strong (car expr)) (pack " с " (cadr expr) "г.")) )
-            x ) ))
+                   (list (.strong (car expr)) (pack "с " (cadr expr) "г.")) )
+            x ) )
+      )
  )
 
 (setq txt
    (.html
-      (.meta '((http-equiv "Content-Type")
-               (content "text/html; charset=utf-8") ) )
+      (.meta (..attrs '((http-equiv "Content-Type")
+                        (content "text/html; charset=utf-8") ) ))
       (.body
          
-         (.h1 '((align center)) "Головань Денис Сергеевич")
+         (.h1 (..attrs '((align center))) "Головань Денис Сергеевич")
          
          (..table
             (list
@@ -97,11 +98,11 @@
          (.p "Семейное положение: женат, детей нет.")
          
          (.br)
-         (.h2 '((align center)) "Опыт работы")
+         (.h2 (..attrs '((align center))) "Опыт работы")
          
          (experience 
             "(июль 2008 по настоящее время)"
-            (pack (.a "http://www.simcorp.com/" "SimCorp Ukraine LLC (г. Киев)") ", отдел Performance Measurement") 
+            (list (.a "http://www.simcorp.com/" "SimCorp Ukraine LLC (г. Киев)") ", отдел Performance Measurement")
             "старший инженер программист" )
          
          (job-description
@@ -211,7 +212,7 @@
          
          
          (.br)
-         (.h2 '((align center)) "Образование")
+         (.h2 (..attrs '((align center))) "Образование")
          
          (education 
                "Сентябрь 2002 - Июль 2003" 
@@ -240,7 +241,7 @@
          (.p "В 1999 г. закончил 8-месячные курсы разговорного английского языка при институте повышения квалификации ПГТУ.")
          
          (.br)
-         (.h2 '((align center)) "Рекомендации")
+         (.h2 (..attrs '((align center))) "Рекомендации")
          
          (recommendation 
             "Серенко Александр Никитич"
@@ -250,10 +251,10 @@
             "Приазовский государственный технический университет" )
          
          (.br)
-         (.h2 '((align center)) "Желаемые условия работы")
+         (.h2 (..attrs '((align center))) "Желаемые условия работы")
          
          (job-conditions 
-            "Полный рабочий день"
+            "Полный рабочий день или удаленная работа"
             "Нормированный рабочий день"
             "Информационные технологии"
             "Да"
@@ -299,4 +300,3 @@
 #(prinl (htmlify txt))
 (prinl txt)
 (bye)
-
