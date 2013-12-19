@@ -2,10 +2,11 @@
 
 (load "html.l")
 
-# ====================Content==========================================================
-(setq lang-current 'en)
-(setq lang-current 'ru)
+# ====================Command-line params==============================================
+(setq lang-current (or lang-current 'en))
+#(setq lang-current 'ru)
 
+# ====================Content==========================================================
 (de lang @
    # получает на вход список с переводами
    # возращает текст согласно текущему lang-current
@@ -139,6 +140,21 @@
             x ) )
       )
  )
+
+(de dev-lang-wanted ()
+   (let 
+      (langs (list "Common Lisp, Clojure" (.img "lisp.png" "lisp-flag") (.br) "APL, A+, J, KDB"))
+      (lang 
+         'ru (list "языки программирования: " (.br) langs)
+         'en (list "programming languages: " (.br) langs) )
+      ))
+
+(de compilation-date ()
+   (let 
+      (dstr (datStr (date)))
+      (lang 
+         'ru (pack "Дата составления: " dstr)
+         'en (pack "Compilation date: " dstr))))
 
 (setq txt
    (..html-std
@@ -446,7 +462,7 @@
          (lang 'ru "Информационные технологии" 'en "Information Technology (IT)")
          (lang 'ru "Да" 'en "Yes")
          (lang 'ru "2-3 недели" 'en "2-3 weeks")
-         (lang 'ru "языки программирования - Common Lisp, Clojure, APL, A+, J, KDB" 'en "Programming languages: Common Lisp, Clojure, APL, A+, J, KDB"))
+         (dev-lang-wanted))
       
       (.br)
       (.p (.strong (lang 'ru "Дополнительная информация :" 'en "Additional information :")))
@@ -492,12 +508,18 @@
             'en "Solving of non-standard engineering problems, software copy-protection, 3D graphics programming, game AI and physical interaction algorithms analysis, study of distribute calculation in global and local networks and problems of network security. I am interested in personnel management technology at large production enterprises and  influence of politics on society life." ) )
       
       (.br)
-      (.p 
-         (lang 'ru "Дата составления: 03-11-2013" 'en "Compilation date: 03-11-2013"))
+      (.p (compilation-date))
+
+      (.a 
+         "https://github.com/MageSlayer/CV" 
+         (lang 
+            'ru "исходник резюме на PicoLisp"
+            'en "CV sources written in PicoLisp" ) )
+      (.br)
+         
+      (.img "logo.png" "lisp-logo")
       
  ) )
 # ====================Content==========================================================
-# тест
-#(prinl (htmlify txt))
 (prinl txt)
 (bye)
